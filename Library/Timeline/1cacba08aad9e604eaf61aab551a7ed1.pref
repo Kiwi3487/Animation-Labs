@@ -15,7 +15,7 @@ MonoBehaviour:
   timeAreaShownRange: {x: -0.17774351, y: 13.2596655}
   trackScale: 1
   playRangeEnabled: 0
-  windowTime: 0
+  windowTime: 3.2333333333333334
   verticalScroll: 0
   sequencerHeaderWidth: 373
   m_TimeAreaPlayRange:
@@ -29,7 +29,7 @@ MonoBehaviour:
     showMarkers: 1
     showInlineCurves: 1
     inlineAnimationCurveHeight: 100
-    lastInlineCurveDataID: 262116115
+    lastInlineCurveDataID: 1789780321
     inlineCurvesState:
       scrollPos: {x: 0, y: 0}
       m_SelectedIDs: 
