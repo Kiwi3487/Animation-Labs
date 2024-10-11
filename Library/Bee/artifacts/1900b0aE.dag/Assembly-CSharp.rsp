@@ -372,6 +372,7 @@
 "Assets/Lab2/Scripts/PathManager.cs"
 "Assets/Lab2/Scripts/PathManagerEditor.cs"
 "Assets/Lab2/Scripts/Waypoints.cs"
+"Assets/Lab3/Scripts/navControl.cs"
 "Assets/UnityAssetStore/AurynSky/Gems Ultimate Pack/Scripts/AnimationScript.cs"
 -langversion:9.0
 
