@@ -1,40 +1,40 @@
-using System.Collections;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class PathManager : MonoBehaviour
 {
-    [HideInInspector] 
-    [SerializeField] public List<Waypoint> Path;
+    [HideInInspector] [SerializeField] public List<Waypoint> path;
 
     public GameObject prefab;
-    int currentPointIndex = 0;
-    public List<GameObject> prefabPoints;
+    private int _currentPointIndex = 0;
 
+    public List<GameObject> prefabPoints;
 
     public Waypoint GetNextTarget()
     {
-        int nextPointIndex = (currentPointIndex + 1) % (Path.Count);
-        currentPointIndex = nextPointIndex;
-        return Path[nextPointIndex];
+        int nextPointIndex = (_currentPointIndex + 1) % (path.Count);
+        _currentPointIndex = nextPointIndex;
+        return path[nextPointIndex];
     }
+    
     public List<Waypoint> GetPath()
     {
-        if (Path == null)
-            Path = new List<Waypoint>();
-        return Path;
+        if (path == null)
+            path = new List<Waypoint>();
+        return path;
     }
 
-    public void CreatAddPoints()
+    public void CreateAddPoint()
     {
         Waypoint go = new Waypoint();
-        Path.Add(go);
+        path.Add(go);
     }
 
-    void Start()
+    private void Start()
     {
         prefabPoints = new List<GameObject>();
-        foreach (Waypoint p in Path)
+        foreach (Waypoint p in path)
         {
             GameObject go = Instantiate(prefab);
             go.transform.position = p.pos;
@@ -42,11 +42,11 @@ public class PathManager : MonoBehaviour
         }
     }
 
-    void Update()
+    private void Update()
     {
-        for (int i = 0; i < Path.Count; i++)
+        for (int i = 0; i < path.Count; i++)
         {
-            Waypoint p = Path[i];
+            Waypoint p = path[i];
             GameObject g = prefabPoints[i];
             g.transform.position = p.pos;
         }

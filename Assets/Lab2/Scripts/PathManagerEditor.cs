@@ -1,40 +1,34 @@
-using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 using UnityEditor;
+using UnityEngine;
 
 [CustomEditor(typeof(PathManager))]
-
-
-public class pathManagerEditor : Editor
+public class PathManagerEditor : Editor
 {
     [SerializeField] private PathManager pathManager;
+    [SerializeField] private List<Waypoint> thePath;
+    private List<int> _toDelete;
 
-    [SerializeField] private List<Waypoint> ThePath;
-
-    private List<int> toDelete;
-
-    private Waypoint selectedPoint = null;
-
-    private bool doRepaint = true;
+    private Waypoint _selectedPoint = null;
+    private bool _doRepaint = true;
 
     private void OnSceneGUI()
     {
-        ThePath = pathManager.GetPath();
-        DrawPath(ThePath);
+        thePath = pathManager.GetPath();
+        DrawPath(thePath);
     }
 
     private void OnEnable()
     {
         pathManager = target as PathManager;
-        toDelete = new List<int>();
+        _toDelete = new List<int>();
     }
 
     public override void OnInspectorGUI()
     {
         this.serializedObject.Update();
-        ThePath = pathManager.GetPath();
-
+        thePath = pathManager.GetPath();
+        
         base.OnInspectorGUI();
         EditorGUILayout.BeginVertical();
         EditorGUILayout.LabelField("Path");
@@ -43,48 +37,48 @@ public class pathManagerEditor : Editor
 
         if (GUILayout.Button("Add point to path"))
         {
-            pathManager.CreatAddPoints();
+            pathManager.CreateAddPoint();
         }
-
+        
         EditorGUILayout.EndVertical();
         SceneView.RepaintAll();
-
     }
 
-    void DrawGUIForPoints()
+    private void DrawGUIForPoints()
     {
-        if (ThePath != null && ThePath.Count > 0)
+        if (thePath != null && thePath.Count > 0)
         {
-            for (int i = 0; i < ThePath.Count; i++)
+            for (int i = 0; i < thePath.Count; i++)
             {
                 EditorGUILayout.BeginHorizontal();
-                Waypoint p = ThePath[i];
+                Waypoint p = thePath[i];
 
                 Color c = GUI.color;
-                if (selectedPoint == p)
+                if (_selectedPoint == p)
                 {
                     GUI.color = Color.green;
                 }
+                
                 Vector3 oldPos = p.GetPos();
-                Vector3 newPos = EditorGUILayout.Vector2Field("", oldPos);
+                Vector3 newPos = EditorGUILayout.Vector3Field("", oldPos);
 
                 if (EditorGUI.EndChangeCheck()) p.SetPos(newPos);
 
                 if (GUILayout.Button("-", GUILayout.Width(25)))
                 {
-                    toDelete.Add(i);
+                    _toDelete.Add(i);
                 }
-                
+
                 GUI.color = c;
                 EditorGUILayout.EndHorizontal();
             }
         }
 
-        if (toDelete.Count > 0)
+        if (_toDelete.Count > 0)
         {
-            foreach (int i in toDelete)
-                ThePath.RemoveAt(i);
-            toDelete.Clear();
+            foreach (int i in _toDelete)
+                thePath.RemoveAt(i);
+            _toDelete.Clear();
         }
     }
 
@@ -95,22 +89,20 @@ public class pathManagerEditor : Editor
             int current = 0;
             foreach (Waypoint wp in path)
             {
-                //draw current
-                //doRepaint = DrawGUIForPoints(wp);
+                // Draw current
+                _doRepaint = DrawPoint(wp);
                 int next = (current + 1) % path.Count;
                 Waypoint wpNext = path[next];
-                DrawPathLine(wp, wpNext);
                 current += 1;
             }
-
-            if (doRepaint) Repaint();
+            if (_doRepaint) Repaint();
         }
     }
 
     public void DrawPathLine(Waypoint p1, Waypoint p2)
     {
         Color c = Handles.color;
-        Handles.color = Color.gray;
+        Handles.color = Color.grey;
         Handles.DrawLine(p1.GetPos(), p2.GetPos());
         Handles.color = c;
     }
@@ -118,33 +110,29 @@ public class pathManagerEditor : Editor
     public bool DrawPoint(Waypoint p)
     {
         bool isChanged = false;
-
-        if (selectedPoint == p)
+        if (_selectedPoint == p)
         {
             Color c = Handles.color;
             Handles.color = Color.green;
-
+            
             EditorGUI.BeginChangeCheck();
-            Vector3 oldpos = p.GetPos();
-            Vector3 newpos = Handles.PositionHandle(oldpos, Quaternion.identity);
-
-            float handleSize = HandleUtility.GetHandleSize(newpos);
-            Handles.SphereHandleCap(-1, newpos, Quaternion.identity, 0.4f * handleSize, EventType.Repaint);
+            Vector3 oldPos = p.GetPos();
+            Vector3 newPos = Handles.PositionHandle(oldPos, Quaternion.identity);
             if (EditorGUI.EndChangeCheck())
             {
-                p.SetPos(newpos);
+                p.SetPos(newPos);
             }
-
             Handles.color = c;
         }
         else
         {
             Vector3 currPos = p.GetPos();
             float handleSize = HandleUtility.GetHandleSize(currPos);
-            if (Handles.Button(currPos, Quaternion.identity, 0.25f * handleSize, 0.25f * handleSize, Handles.SphereHandleCap))
+            if (Handles.Button(currPos, Quaternion.identity, 0.25f * handleSize, 0.25f * handleSize,
+                    Handles.SphereHandleCap))
             {
                 isChanged = true;
-                selectedPoint = p;
+                _selectedPoint = p;
             }
         }
         return isChanged;

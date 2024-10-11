@@ -1,69 +1,74 @@
-using System.Collections;
 using System.Collections.Generic;
-using System.IO;
-using Unity.Mathematics;
 using UnityEngine;
 
-public class pathController : MonoBehaviour
+public class PathController : MonoBehaviour
 {
-    [SerializeField] public PathManager pathManager;
+    [SerializeField] private PathManager pathManager;
 
-    private List<Waypoint> thePath;
-    private Waypoint target;
+    private List<Waypoint> _thePath;
+    private Waypoint _target;
 
-    public float MoveSpeed;
-    public float RotateSpeed;
+    public float moveSpeed;
+    public float rotateSpeed;
     public Animator animator;
-
+    private bool _isSprinting;
+    private bool _canMove = true;
+    
     void Start()
     {
+        animator.SetBool("isSprinting", false);
         
-        thePath = pathManager.GetPath();
-        if (thePath != null && thePath.Count > 0)
+        _thePath = pathManager.GetPath();
+        if (_thePath != null && _thePath.Count > 0)
         {
-            target = thePath[0];
+            _target = _thePath[0];
         }
     }
 
-    void rotateTowardsTarget()
+    private void RotateTowardsTarget()
     {
-        float stepSize = RotateSpeed * Time.deltaTime;
+        float stepSize = rotateSpeed * Time.deltaTime;
 
-        Vector3 targetDir = target.pos - transform.position;
+        Vector3 targetDir = _target.pos - transform.position;
         Vector3 newDir = Vector3.RotateTowards(transform.forward, targetDir, stepSize, 0.0f);
-        // transform.rotation = quaternion.LookRotation(newDir);
+        transform.rotation = Quaternion.LookRotation(newDir);
     }
 
-    void moveTowards()
+    private void MoveToward()
     {
-        float stepSize = Time.deltaTime * MoveSpeed;
-        float distanceToTarget = Vector3.Distance(transform.position, target.pos);
+        float stepSize = Time.deltaTime * moveSpeed;
+        float distanceToTarget = Vector3.Distance(transform.position, _target.pos);
         if (distanceToTarget < stepSize)
         {
             return;
         }
-
         Vector3 moveDir = Vector3.forward;
-        transform.Translate(moveDir* stepSize);
+        transform.Translate(moveDir * stepSize);
     }
 
-    // void Update()
-    // {
-    //     if (Input.anyKeyDown)
-    //     {
-    //         isSprinting = !isSprinting;
-    //         animator.SetBool("Sprinting", isSprinting);
-    //     }
-    //
-    //     if (isSprinting)
-    //     {
-    //         rotateTowardsTarget();
-    //         moveTowards();
-    //     }
-    // }
-    
+    private void Update()
+    {
+        if (Input.anyKeyDown)
+        {
+            _isSprinting = !_isSprinting;
+            animator.SetBool("isSprinting", _isSprinting);
+        }
+
+        if (_isSprinting && _canMove)
+        {
+            RotateTowardsTarget();
+            MoveToward();
+        }
+    }
+
     private void OnTriggerEnter(Collider other)
     {
-        target = pathManager.GetNextTarget();
+        _target = pathManager.GetNextTarget();
+
+        if (other.gameObject.CompareTag("Player"))
+        {
+            animator.SetBool("isSprinting", false);
+            _canMove = false;
+        }
     }
 }
