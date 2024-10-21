@@ -1,11 +1,12 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+
 public class navControl : MonoBehaviour
 {
     public GameObject Target;
+    public GameObject Dragon;
     private NavMeshAgent AI;
     private bool isWalking = true;
     private Animator _animator;
@@ -20,29 +21,32 @@ public class navControl : MonoBehaviour
 
     void Update()
     {
-        if(isWalking)
+        if (isWalking)
+        {
             AI.destination = Target.transform.position;
+        }
         else
         {
-            {
-                AI.destination = transform.position;
-            }
+            AI.destination = transform.position;
         }
     }
 
 
-    private void OnTriggerEnter(Collider other)
+    private void OnTriggerStay(Collider other)
     {
         if (other.CompareTag("Dragon"))
         {
             isWalking = false;
             _animator.SetTrigger("Attack");
+            
+            Vector3 targetPosition = new Vector3(Dragon.transform.position.x, transform.position.y, Dragon.transform.position.z);
+            transform.LookAt(targetPosition);
         }
     }
 
     private void OnTriggerExit(Collider other)
     {
-        if(other.CompareTag("Dragon"))
+        if (other.CompareTag("Dragon"))
         {
             isWalking = true;
             _animator.SetTrigger("Walk");
