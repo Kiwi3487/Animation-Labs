@@ -374,6 +374,8 @@
 "Assets/Lab2/Scripts/Waypoints.cs"
 "Assets/Lab3/Scripts/navControl.cs"
 "Assets/UnityAssetStore/AurynSky/Gems Ultimate Pack/Scripts/AnimationScript.cs"
+"Assets/Unrelated - GameJamTest/Fish AI.cs"
+"Assets/Unrelated - GameJamTest/Hookmovement.cs"
 -langversion:9.0
 
 /deterministic
